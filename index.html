@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Edición Especial Amor ❤️</title>
+    <style>
+        :root {
+            --color-sobre: #FF9EAA;
+            --color-flap: #FF8598;
+            --color-texto: #d65a75;
+            --rosa-periodico: #fff5f6;
+            --borde-vintage: #eab4bb;
+        }
+
+        body {
+            margin: 0; padding: 0; min-height: 100vh; width: 100vw;
+            display: flex; justify-content: center; align-items: center;
+            font-family: 'Times New Roman', Times, serif;
+            overflow: hidden;
+            background-color: #fce4ec; 
+            background-image: url("https://i.postimg.cc/Kz5rG6t6/a.jpg"); 
+            background-size: cover; background-position: center;
+        }
+
+        /* --- SOBRE --- */
+        .envelope-wrapper { 
+            position: relative; width: 280px; height: 180px; cursor: pointer; z-index: 10; 
+            animation: float 3s ease-in-out infinite; 
+        }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        .envelope { position: relative; width: 100%; height: 100%; background-color: var(--color-sobre); box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 11; }
+        .flap { position: absolute; width: 0; height: 0; z-index: 12; }
+        .flap.left { border-top: 90px solid transparent; border-bottom: 90px solid transparent; border-left: 140px solid #FFB6C1; top: 0; left: 0; }
+        .flap.right { border-top: 90px solid transparent; border-bottom: 90px solid transparent; border-right: 140px solid #FFC5D0; top: 0; right: 0; }
+        .flap.top { border-left: 140px solid transparent; border-right: 140px solid transparent; border-top: 100px solid var(--color-flap); top: 0; left: 0; transform-origin: top; transition: transform 0.6s ease-in-out 0.2s, z-index 0.2s; z-index: 14; }
+        
+        .envelope.open .flap.top { transform: rotateX(180deg); z-index: 0; }
+        .heart-seal { position: absolute; top: 85px; left: 50%; transform: translate(-50%, -50%); font-size: 40px; z-index: 15; animation: heartbeat 1.5s infinite; }
+        @keyframes heartbeat { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.15); } }
+
+        /* --- TARJETA --- */
+        .modal-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 192, 203, 0.5); backdrop-filter: blur(8px);
+            display: none; z-index: 100;
+        }
+        .modal-bg.active { display: block; }
+
+        .full-card {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            width: 90vw; height: 90vh; max-width: 400px;
+            background: var(--rosa-periodico);
+            border: 1px solid var(--borde-vintage);
+            box-shadow: 0 0 0 10px var(--rosa-periodico), 0 0 0 11px var(--borde-vintage), 0 20px 50px rgba(0,0,0,0.2);
+            z-index: 101; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding: 20px; box-sizing: border-box; display: flex; flex-direction: column;
+        }
+        .full-card.active { transform: translate(-50%, -50%) scale(1); }
+
+        .news-header {
+            text-align: center; border-bottom: 3px double var(--borde-vintage);
+            margin-bottom: 15px; padding-bottom: 10px;
+        }
+        .news-header h1 { font-size: 28px; margin: 0; color: #5a3e3e; text-transform: uppercase; }
+        .news-header .meta { font-size: 11px; text-transform: uppercase; color: var(--color-texto); border-top: 1px solid var(--borde-vintage); margin-top: 5px; padding-top: 3px; }
+
+        .photo-frame {
+            width: 100%; height: auto; aspect-ratio: 1/1; margin-bottom: 10px;
+            background: white; padding: 8px; box-sizing: border-box;
+            border: 1px solid #ddd; flex-shrink: 0; overflow: hidden;
+        }
+        .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+        .photo-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+            margin-bottom: 10px; overflow-y: auto; max-height: 300px;
+        }
+        .grid-item { background: white; padding: 4px; border: 1px solid #ddd; aspect-ratio: 1/1; overflow: hidden; }
+        .grid-item img { width: 100%; height: 100%; object-fit: cover; }
+
+        .page { display: none; height: 100%; flex-direction: column; }
+        .page.active { display: flex; animation: fadeIn 0.6s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .article-title { font-size: 20px; font-weight: bold; color: #222; margin: 5px 0; }
+        .article-text { color: #444; font-size: 14px; line-height: 1.3; text-align: justify; }
+
+        .final-buttons { margin-top: auto; height: 60px; position: relative; display: flex; align-items: center; gap: 10px; }
+        .btn-yes { flex: 1; height: 50px; background: var(--color-flap); color: white; border: none; font-family: 'Courier New', monospace; font-weight: bold; cursor: pointer; font-size: 16px; border-radius: 5px; z-index: 105; }
+        .btn-no-container { flex: 1; height: 50px; position: relative; }
+        .btn-no { position: absolute; width: 100%; height: 100%; background: #d0d0d0; color: #555; border: none; font-family: 'Courier New', monospace; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.1s ease; z-index: 110; border-radius: 5px; left:0; top:0;}
+        .btn-next { background: #444; color: white; border: none; padding: 15px 0; width: 100%; margin-top: auto; font-family: 'Courier New', monospace; font-weight: bold; cursor: pointer; }
+
+        .heart-fly { position: fixed; color: var(--color-flap); pointer-events: none; z-index: 200; animation: fly 3s linear forwards; }
+        @keyframes fly { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-100vh) translateX(var(--rx)); opacity: 0; } }
+    </style>
+</head>
+<body>
+
+    <audio id="musicaFondo" src="monet.mp3" loop preload="auto"></audio>
+    <audio id="sndPage" src="https://assets.mixkit.co/active_storage/sfx/1101/1101-preview.mp3" preload="auto"></audio>
+    <audio id="sndFart" src="https://www.myinstants.com/media/sounds/fart-with-reverb.mp3" preload="auto"></audio>
+    <audio id="sndVictoria" src="https://www.dropbox.com/scl/fi/3526ujn1lp4uyocrpnq1h/Yupi-yupi-__-meme-__-lo-que-me-diooo-mi-mujerrr-la-amooooo-MP3_160K.mp3?rlkey=3kyviczhtrqs0lzm69txali8y&raw=1" preload="auto"></audio>
+
+    <div class="envelope-wrapper" id="envelope">
+        <div class="envelope">
+            <div class="flap left"></div><div class="flap right"></div><div class="flap top"></div>
+            <div class="heart-seal">💖</div>
+        </div>
+    </div>
+
+    <div class="modal-bg" id="modalBg"></div>
+
+    <div class="full-card" id="fullCard">
+        <div class="news-header">
+            <h1>SAN VALENTÍN</h1>
+            <div class="meta">Edición Especial • 2026</div>
+        </div>
+
+        <div class="page active" id="p1">
+            <div class="photo-frame"><img src="https://i.postimg.cc/W3D5WjzG/juntos5.jpg" alt="1"></div>
+            <div class="article-title">¡NUESTRA PRIMERA FOTO JUNTOS!</div>
+            <p class="article-text">El inicio de todo esto. Desde ese momento en el cual sentí esa conexión única. Me encantas desde el primer momento. ❤️</p>
+            <button class="btn-next" onclick="goPage(2)">Sigue leyendo →</button>
+        </div>
+
+        <div class="page" id="p2">
+            <div class="photo-frame"><img src="https://i.postimg.cc/qRt1b0qg/juntos3.jpg" alt="2"></div>
+            <div class="article-title">¡MI FOTO FAVORITA!</div>
+            <p class="article-text">Seguramente vas a pensar lo contrario a mí, pero esta foto juntos es la que más me gusta. somos simplemente nosotros pasando un buen momento, y yo te veo hermosa así que por eso es mi favorita✨</p>
+            <button class="btn-next" onclick="goPage(3)">Siguiente →</button>
+        </div>
+
+        <div class="page" id="p3">
+            <div class="photo-frame"><img src="https://i.postimg.cc/xd0kPcwH/juntos.jpg" alt="3"></div>
+            <div class="article-title">¡ADORO TU COMPAÑIA!</div>
+            <p class="article-text">Los momentos juntos son los que más atesoro y recuerdo con mucha felicidad. No importa si solo es un ratito que te veo, me encanta sentir tu presencia.</p>
+            <button class="btn-next" onclick="goPage(4)">Siguiente →</button>
+        </div>
+
+        <div class="page" id="p4">
+            <div class="article-title" style="text-align: center;">¡MIS 6 FOTOS FAVORITAS TUYAS!</div>
+            <div class="photo-grid">
+                <div class="grid-item"><img src="https://i.postimg.cc/6Q97hyk8/ella1.jpg"></div>
+                <div class="grid-item"><img src="https://i.postimg.cc/q7ktGzP7/ella2.jpg"></div>
+                <div class="grid-item"><img src="https://i.postimg.cc/FK9fx7Mk/ella3.jpg"></div>
+                <div class="grid-item"><img src="https://i.postimg.cc/d0q79LbT/ella4.jpg"></div>
+                <div class="grid-item"><img src="https://i.postimg.cc/N0gyx53R/ella5.jpg"></div>
+                <div class="grid-item"><img src="https://i.postimg.cc/25zqxVsb/ella6.jpg"></div>
+            </div>
+            <p class="article-text" style="font-style: italic; text-align: center; font-size: 12px;">"Sinceramente no sé que poner acá, se explica solo, me encantas. Son mis favoritas, no me critiques porfaa"</p>
+            <button class="btn-next" onclick="goPage(5)">Siguiente →</button>
+        </div>
+
+        <div class="page" id="p5">
+            <div class="photo-frame"><img src="https://i.postimg.cc/tgX1zYKz/juntos4.jpg" alt="4"></div>
+            <div class="article-title">¡EXPERIENCIAS JUNTOS!</div>
+            <p class="article-text">Mi plan favorito siempre va a ser ir a donde vos quieras ir, solo para tener el privilegio de verte así de radiante. Tu emoción me contagia y me enamora. Me encanta acompañarte y perderme viendo tu sonrisa. </p>
+            <button class="btn-next" onclick="goPage(6)">Contraportada →</button>
+        </div>
+
+        <div class="page" id="p6">
+            <div class="photo-frame"><img src="https://i.postimg.cc/Gt7FYv7v/6b174d05425a0213e6c4e3e5048b5587.jpg" alt="5"></div>
+            <div class="article-title">¿QUERES SER MI SAN VALENTÍN?</div>
+            <div class="final-buttons">
+                <button class="btn-yes" onclick="celebrar()">SÍ</button>
+                <div class="btn-no-container">
+                    <button class="btn-no" id="btnNo">NO</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const envelope = document.getElementById('envelope');
+        const fullCard = document.getElementById('fullCard');
+        const modalBg = document.getElementById('modalBg');
+        const btnNo = document.getElementById('btnNo');
+        const sndPage = document.getElementById('sndPage');
+        const sndFart = document.getElementById('sndFart');
+        const sndVictoria = document.getElementById('sndVictoria');
+        const musica = document.getElementById('musicaFondo');
+
+        // Función para asegurar reproducción
+        function reproducirFondo() {
+            musica.volume = 0.5;
+            const playPromise = musica.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log("Auto-play prevenido, reintentando...");
+                });
+            }
+        }
+
+        envelope.addEventListener('click', () => {
+            if(!envelope.classList.contains('open')) {
+                envelope.classList.add('open');
+                
+                // Forzar reproducción al hacer clic
+                reproducirFondo();
+
+                spawnHearts();
+                sndPage.load(); sndFart.load(); sndVictoria.load();
+                
+                setTimeout(() => {
+                    fullCard.classList.add('active');
+                    modalBg.classList.add('active');
+                }, 1200);
+            }
+        });
+
+        function goPage(n) {
+            sndPage.currentTime = 0;
+            sndPage.play().catch(e => {});
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('p' + n).classList.add('active');
+        }
+
+        function spawnHearts() {
+            for(let i=0; i<20; i++) {
+                setTimeout(() => {
+                    const h = document.createElement('div');
+                    h.innerHTML = '💖';
+                    h.className = 'heart-fly';
+                    h.style.left = Math.random() * 100 + 'vw';
+                    h.style.top = '100vh';
+                    h.style.setProperty('--rx', (Math.random()*200 - 100) + 'px');
+                    document.body.appendChild(h);
+                    setTimeout(() => h.remove(), 3000);
+                }, i*100);
+            }
+        }
+
+        const moverNo = () => {
+            sndFart.currentTime = 0;
+            sndFart.play().catch(e => {});
+            const x = Math.random() * 200 - 150;
+            const y = Math.random() * 200 - 250;
+            btnNo.style.transform = `translate(${x}px, ${y}px)`;
+        };
+
+        btnNo.addEventListener('mouseover', moverNo);
+        btnNo.addEventListener('touchstart', (e) => { e.preventDefault(); moverNo(); });
+
+        function celebrar() {
+            musica.pause(); 
+            sndVictoria.currentTime = 0;
+            sndVictoria.volume = 1.0;
+            sndVictoria.play().catch(e => console.log("Error sonido final"));
+            
+            alert("GRACIAS POR ACEPTAR, TE AMO MUUUUCHOOOO");
+            setInterval(spawnHearts, 600);
+        }
+    </script>
+</body>
+</html>
